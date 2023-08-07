@@ -3,7 +3,7 @@
    require "conecta.php";
    $con = conecta();
 
-   $codigo    = trim($_POST['codigo']);
+   $codigo    = $_POST['codigo'];
 
    //Comprobar disponibilidad
    $sql = "SELECT * FROM usuarios WHERE codigo = $codigo";
@@ -15,17 +15,19 @@
       $mensaje = "Código ya en uso";
    }
    else {
-      $nombre    = trim($_POST['nombre']);
-      $peso      = trim($_POST['peso']);
-      $altura    = trim($_POST['altura']);
-      $correo    = trim($_POST['correo']);
-      $password  = trim($_POST['password']);
+      $nombre    = $_POST['nombre'];
+      $peso      = $_POST['peso'];
+      $altura    = $_POST['altura'];
+      $correo    = $_POST['correo'];
+      $password  = $_POST['password'];
       
       $passwordC = md5($password);
-      $anio_nac = trim($_POST['anio_nac']);
+      $anio_nac  = $_POST['anio_nac'];
+      $rank      = $_POST['rank'];
+      echo $rank;
 
-      $sql = "INSERT INTO usuarios (codigo, nombre, peso, altura, correo, password, anio_nac)
-      VALUES ('$codigo', '$nombre', '$peso', '$altura', '$correo', '$passwordC', '$anio_nac')";
+      $sql = "INSERT INTO usuarios (codigo, nombre, peso, altura, correo, password, anio_nac, rank)
+      VALUES ('$codigo', '$nombre', '$peso', '$altura', '$correo', '$passwordC', '$anio_nac', '$rank')";
 
       mysqli_query($con, $sql);
       mysqli_close($con);

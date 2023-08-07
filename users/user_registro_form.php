@@ -5,7 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
+    <script src="obtener_rank.js"></script>
+    <!--Tensorflow-->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script>
+        var modelo = null;
+        CargarModelo();
         var contraInvalida = "Ingrese una contraseña con al menos 7 caracteres";
         function ValidarContrasena(){
             if(registro.password.value.length >= 7) {
@@ -16,13 +21,44 @@
         function ValidarCampos() {
             var mensaje = "Faltan campos por llenar";
             var contra = ValidarContrasena();
-            if (!contra)
+            
+            if (!contra) {
                 alert(contraInvalida);
-            else if(!registro.codigo.value || !registro.nombre.value || !registro.peso.value || !registro.altura.value
-            || !registro.correo.value || !registro.password.value || !registro.anio_nac.value) {
+                return false; // Evitar el envío del formulario
+            } else if (!registro.codigo.value || !registro.nombre.value || !registro.peso.value || !registro.altura.value
+                || !registro.correo.value || !registro.password.value || !registro.anio_nac.value) {
                 alert(mensaje);
-            } else
-                registro.submit();
+                return false; // Evitar el envío del formulario
+            } else {
+                return true; // El formulario es válido, puede ser enviado
+            }
+        }
+        async function CargarModelo() {
+            console.log("Cargando el modelo...");
+            modelo = await tf.loadLayersModel("../red_neuronal/model.json");
+            console.log("Modelo cargado :)");
+        }
+        function ObtenerRank() {
+            if(!ValidarCampos()){
+                return;
+            }
+
+            var pso = document.getElementById('peso').value;
+            var altura = document.getElementById('altura').value;
+            var año = document.getElementById('anio_nac').value;
+
+            if (modelo != null) {
+                var tensor = tf.tensor2d([[parseInt(pso), parseInt(altura), parseInt(año)]]);
+                var prediccion = modelo.predict(tensor).dataSync();
+                prediccion = parseFloat(prediccion); //Convertir texto a flotante
+                prediccion = prediccion.toFixed(2); //Truncar 2 decimales
+            } else {
+                alert("Inténtalo de nuevo");
+                return;
+            }
+            //alert(prediccion);
+            var rank = document.getElementById('rank');
+            rank.value = prediccion;
         }
     </script>
         <!-- Boostrap 5 -->
@@ -32,7 +68,7 @@
         <!--CSS-->
         <link rel="stylesheet" href="styles/user_registro.css">
 </head>
-<body class=" bg-dark d-flex justify-content-center align-items-center vh-100 ">
+<body class="bg-dark d-flex justify-content-center align-items-center vh-100 ">
     <!--Contenedor del form blanco-->
     <div class="bg-white p-5 rounded-5 text-secondary " style="width: 25rem;">
         <!--Texto: Registro-->
@@ -51,12 +87,12 @@
                     <!--Peso-->
                     <div class="input-group mt-1">
                         <div class="input-group-text bg-warning"></div>
-                        <input class="form-control" type="number" name="peso" placeholder="Peso" step="any">
+                        <input class="form-control" type="number" id="peso" name="peso" placeholder="Peso" step="any">
                     </div>
                     <!--Altura-->
                     <div class="input-group mt-1">
                         <div class="input-group-text bg-warning"></div>
-                        <input class="form-control" type="number" name="altura" placeholder="Altura (CM)">
+                        <input class="form-control" type="number" id="altura" name="altura" placeholder="Altura (CM)">
                     </div>
                     <!--Correo-->
                     <div class="input-group mt-1">
@@ -72,13 +108,14 @@
                     <p class="text-center fw-bold" id="fecha_label">Año de nacimiento:</p>
                     <div class="input-group mt-1">
                         <div class="input-group-text bg-warning"></div>
-                        <input class="form-control" type="number" name="anio_nac" placeholder="Año de nacimiento">
+                        <input class="form-control" type="number" id="anio_nac" name="anio_nac" placeholder="Año de nacimiento">
                     </div>     
-                    <!--RANK AQUI-->
+                    <!--RANK-->
+                    <input type="hidden" id="rank" name="rank">
                 <!--Botón enviar-->
                 <input type="submit" class="btn btn-danger text-white w-100 mt-4 fw-semibold shadow-sm" 
-                    name="registrar" value="Enviar" onclick="ValidarCampos(); return false;"
-                />
+                    name="registrar" value="Enviar" onclick="ObtenerRank();"
+                />                
             </form>
         <div class="d-flex gap-1 justify-content-center mt-1">
             <a href="../index.php" class="text-decoration-none text-danger fw-semibold ">Cancelar</a>

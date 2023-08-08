@@ -38,6 +38,14 @@
             modelo = await tf.loadLayersModel("../red_neuronal/model.json");
             console.log("Modelo cargado :)");
         }
+        function ActualizarModelo() {
+            fetch('../red_neuronal/rdNeuronal.py', {
+                method: 'POST', // Método POST para enviar datos al script Python si es necesario
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
         function ObtenerRank() {
             if(!ValidarCampos()){
                 return;
@@ -59,6 +67,8 @@
             //alert(prediccion);
             var rank = document.getElementById('rank');
             rank.value = prediccion;
+
+            ActualizarModelo();
         }
     </script>
         <!-- Boostrap 5 -->
@@ -121,5 +131,6 @@
             <a href="../index.php" class="text-decoration-none text-danger fw-semibold ">Cancelar</a>
         </div>
     </div>
+    <div id="resultado"></div>
 </body>
 </html>

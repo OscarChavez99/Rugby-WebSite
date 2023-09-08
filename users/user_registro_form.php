@@ -33,19 +33,14 @@
                 return true; // El formulario es válido, puede ser enviado
             }
         }
+        
         async function CargarModelo() {
             console.log("Cargando el modelo...");
             modelo = await tf.loadLayersModel("../red_neuronal/model.json");
             console.log("Modelo cargado :)");
-        }
-        function ActualizarModelo() {
-            fetch('../red_neuronal/rdNeuronal.py', {
-                method: 'POST', // Método POST para enviar datos al script Python si es necesario
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
+        } 
+        
+        
         function ObtenerRank() {
             if(!ValidarCampos()){
                 return;
@@ -58,8 +53,13 @@
             if (modelo != null) {
                 var tensor = tf.tensor2d([[parseInt(pso), parseInt(altura), parseInt(año)]]);
                 var prediccion = modelo.predict(tensor).dataSync();
+                //alert(prediccion);
                 prediccion = parseFloat(prediccion); //Convertir texto a flotante
                 prediccion = prediccion.toFixed(2); //Truncar 2 decimales
+                if (prediccion > 3)
+                    prediccion = 3;
+                if (prediccion < 0)
+                    prediccion = 0;
             } else {
                 alert("Inténtalo de nuevo");
                 return;
@@ -67,8 +67,6 @@
             //alert(prediccion);
             var rank = document.getElementById('rank');
             rank.value = prediccion;
-
-            ActualizarModelo();
         }
     </script>
         <!-- Boostrap 5 -->

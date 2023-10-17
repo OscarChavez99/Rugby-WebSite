@@ -23,7 +23,7 @@ def RedNeuronal():
     )
     
     try:
-     datos = 0
+     #datos = 0
      with connection.cursor() as cursor:
             # Ejecutar una consulta SQL
          sql_query = "SELECT peso, altura, anio_nac, rank FROM usuarios"
@@ -33,11 +33,10 @@ def RedNeuronal():
 
          results = cursor.fetchall()
          for row in results:
-             datos += 1
              features.append((row['peso'],row['altura'],row['anio_nac']))
              targets.append(row['rank'])
             
-         mensaje = str(datos) + ': datos cargados de la BD'
+         mensaje = str(len(features)) + ': datos cargados de la BD'
          print("\n" + mensaje + '\n')
     finally:
     # Cerrar la conexión
@@ -74,7 +73,6 @@ def RedNeuronal():
 
     print('Modelo Entrenado!') # Print para termino del entrenamiento
     modelo.save('Datos_jugadores.h5') #Exportar el modelo en formato h5 
-
 
     comando = f"tensorflowjs_converter --input_format keras Datos_jugadores.h5 ." #Variable que se utiliza para guardar el comando que se quiere utilizar
     subprocess.run(comando, shell=True, check= True)#Utilizando la libreria subprocess se ejecuta el comando ya definido, 'shell' permite que el comando se ejecute en una shell y 'check' garantiza que el proceso se detenga si se encuentra algun error en la ejecucion del comando

@@ -13,6 +13,11 @@ def RedNeuronal():
     password = 'LJwG?Ub7.'
     db_name = 'u292477693_rugby'
 
+    '''host = 'localhost'
+    user = 'root'
+    password = ''
+    db_name = 'rugby'''
+
     # Conectar a la base de datos
     connection = pymysql.connect(
         host=host,
@@ -26,14 +31,14 @@ def RedNeuronal():
      #datos = 0
      with connection.cursor() as cursor:
             # Ejecutar una consulta SQL
-         sql_query = "SELECT peso, altura, anio_nac, rank FROM usuarios"
+         sql_query = "SELECT peso, altura, rank FROM usuarios"
          cursor.execute(sql_query)
          features = [] #Arreglo de peso, altura y año de nacimiento
          targets = []#Arreglo de ranks
 
          results = cursor.fetchall()
          for row in results:
-             features.append((row['peso'],row['altura'],row['anio_nac']))
+             features.append((row['peso'],row['altura']))
              targets.append(row['rank'])
             
          mensaje = str(len(features)) + ': datos cargados de la BD'
@@ -43,8 +48,8 @@ def RedNeuronal():
         connection.close()
 
 
-    capaEntrada = tf.keras.layers.Dense(units=3, input_shape=[3]) # Capa de entrada con 3 neuronas, una para cada entrada que en este caso son 3 (peso,altura,año de nacimiento)
-    capaOculta  = tf.keras.layers.Dense(units=4) # Capa oculta con 3 neuronas para los calculos
+    capaEntrada = tf.keras.layers.Dense(units=2, input_shape=[2]) # Capa de entrada con 3 neuronas, una para cada entrada que en este caso son 3 (peso,altura,año de nacimiento)
+    capaOculta  = tf.keras.layers.Dense(units=2) # Capa oculta con 3 neuronas para los calculos
     capaSalida  = tf.keras.layers.Dense(units=1) # Capa de salida con una sola neurona, que se encargara de mostrar la clasificacion (JP,JM o JB)
 
     modelo = tf.keras.Sequential([capaEntrada, capaOculta, capaSalida]) # Modelo secuencial para este sistema, e indicando el orden de las capas
@@ -59,7 +64,12 @@ def RedNeuronal():
     modelo.fit(features,targets, epochs = 500, verbose = False) # Almacenar el resulta dodel entrenamiento, que le pasaremos las entradas, salidas y la repeticion de entrenamiento
     
     loss = modelo.evaluate(features, targets)
-    print("Pérdida en el conjunto de prueba:", loss)
+
+    if (loss > 0.4):
+        print('Optimizando...')
+        RedNeuronal()
+        
+    #print("Pérdida en el conjunto de prueba:", loss)
 
     #Para gráfica
     '''
